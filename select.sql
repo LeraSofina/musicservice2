@@ -13,22 +13,25 @@ from album a
 join track t on a.album_id = t.album_id
 group by album_name;
 
-select musician_name
-from musician m 
-join albummusician a on m.musician_id = a.musician_id
-join album a2 on a.album_id = a2.album_id 
-where album_year not between '2020-01-01' and '2020-12-31'
-group by musician_name;
 
-select collection_name 
+select musician_name
+from musician 
+	join albummusician USING(musician_id)
+	join album USING(album_id)
+where musician_id not in (SELECT musician_id 
+							  from albummusician 
+							  		inner join album using(album_id)
+							  where TO_CHAR(album_year, 'YYYY') LIKE '%2020%');
+
+							 
+select distinct collection_name 
 from collection c 
 join trackcollection t on c.collection_id = t.collection_id 
 join track using(track_id)
 join album using(album_id)
 join albummusician using(album_id)
 join musician using(musician_id)
-where musician_name like 'Би-2'
-GROUP BY collection_name;
+where musician_name like 'Би-2';
 
 select album_name
 from album
@@ -42,16 +45,14 @@ having count(music_genre) > 1;
 select track_name
 from track
 join trackcollection using(track_id)
-where trackcollection.track_id is Null
-group by track_name;
+where trackcollection.track_id is Null;
 
 select musician_name
 from musician
 join albummusician using(musician_id)
 join album using(album_id)
 join track using(album_id)
-where track_length = (select min(track_length) from track)
-group by musician_name;
+where track_length = (select min(track_length) from track);
 
 select album_name
 from album 
